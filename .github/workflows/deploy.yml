@@ -28,11 +28,10 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-
       - name: Deploy to ECS
         run: |
           terraform init
 #          terraform destroy -auto-approve
-          terraform plan
+#          terraform plan
 #          terraform apply -auto-approve
 
