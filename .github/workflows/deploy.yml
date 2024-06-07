@@ -31,8 +31,8 @@ jobs:
 
       - name: Deploy to ECS
         run: |
+          terraform init
           terraform destroy -auto-approve
-          # terraform init
           # terraform plan
           # terraform apply -auto-approve
 
