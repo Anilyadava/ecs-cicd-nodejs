@@ -21,7 +21,7 @@ resource "aws_ecs_task_definition" "hello_world_task" {
 
   container_definitions = jsonencode([{
     name      = "hello-world"
-    image     = "YOUR_DOCKERHUB_USERNAME/hello-world:latest"
+    image     = "anilyadava/hello-world:latest"
     essential = true
     portMappings = [{
       containerPort = 3000
