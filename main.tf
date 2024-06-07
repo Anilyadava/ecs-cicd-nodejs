@@ -21,11 +21,11 @@ resource "aws_ecs_task_definition" "hello_world_task" {
 
   container_definitions = jsonencode([{
     name      = "hello-world"
-    image     = "anilyadava/hello-world:latest"
+    image     = "nginx:latest"
     essential = true
     portMappings = [{
-      containerPort = 3000
-      hostPort      = 3000
+      containerPort = 80
+      hostPort      = 80
     }]
   }])
 
@@ -59,15 +59,20 @@ resource "aws_ecs_service" "hello_world_service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = [aws_subnet.demo.id]
+    subnets         = [aws_subnet.demo.id,aws_subnet.demo1.id]
     security_groups = [aws_security_group.demo.id]
+    assign_public_ip = true
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.hello_world_tg.arn
     container_name   = "hello-world"
-    container_port   = 3000
+    container_port   = 80
   }
+  depends_on = [  
+    aws_lb.hello_world_lb,
+    aws_lb_listener.hello_world_listener
+  ]
 }
 
 resource "aws_lb" "hello_world_lb" {
@@ -75,14 +80,15 @@ resource "aws_lb" "hello_world_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.demo.id]
-  subnets            = [aws_subnet.demo.id]
+  subnets            = [aws_subnet.demo.id,aws_subnet.demo1.id ]
 }
 
 resource "aws_lb_target_group" "hello_world_tg" {
   name     = "hello-world-tg"
-  port     = 3000
+  port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.demo.id
+  target_type = "ip"
 }
 
 resource "aws_lb_listener" "hello_world_listener" {
@@ -100,12 +106,21 @@ resource "aws_vpc" "demo" {
   cidr_block = "10.0.0.0/16"
 }
 
+#IGW
+resource "aws_internet_gateway" "demo-igw" {
+  vpc_id = aws_vpc.demo.id
+}
+
 resource "aws_subnet" "demo" {
   vpc_id            = aws_vpc.demo.id
   cidr_block        = "10.0.1.0/24"
   availability_zone = "us-east-1a"
 }
-
+resource "aws_subnet" "demo1" {
+  vpc_id            = aws_vpc.demo.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "us-east-1b"
+}
 resource "aws_security_group" "demo" {
   vpc_id = aws_vpc.demo.id
 
