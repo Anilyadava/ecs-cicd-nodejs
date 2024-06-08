@@ -32,6 +32,8 @@ jobs:
       - name: Deploy to ECS
         run: |
           terraform init
+          env:
+            AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           # terraform plan
           # terraform apply -auto-approve          
 
