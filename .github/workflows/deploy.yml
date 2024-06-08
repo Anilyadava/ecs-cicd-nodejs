@@ -30,10 +30,11 @@ jobs:
           aws-region: us-east-1
 
       - name: Terraform Init
+        if: steps.terraform_init_check.outputs.initialized != 'true'      
         run: terraform init -backend-config="bucket=${{ secrets.AWS_S3_BUCKET }}"
 
       - name: Terraform plan
         run: terraform plan
 
-      # - name: Terraform apply
-      #   run: terraform destroy -auto-approve
+      - name: Terraform apply
+        run: terraform destroy -auto-approve
