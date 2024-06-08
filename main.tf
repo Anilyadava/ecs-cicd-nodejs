@@ -157,7 +157,8 @@ resource "aws_route_table" "public_demo_rt" {
   }
 }
 resource "aws_route_table_association" "public_association_demo" {
-  subnet_id      = [aws_subnet.demo.id,aws_subnet.demo1.id] 
+  count = 2
+  subnet_id      = element([aws_subnet.demo.id, aws_subnet.demo1.id], count.index)
   route_table_id = aws_route_table.public_demo_rt.id
 }
 
@@ -167,6 +168,12 @@ resource "aws_security_group" "demo" {
   ingress {
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
