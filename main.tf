@@ -1,3 +1,16 @@
+terraform {
+  backend "s3" {
+    region  = "us-east-1"
+    key     = "terrraform.tfstate"
+    encrypt = "true"
+  }
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+  required_version = ">= 0.13"
+}
 provider "aws" {
   region = "us-east-1"
   default_tags {
