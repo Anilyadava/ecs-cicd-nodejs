@@ -29,11 +29,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy to ECS
-        run: |
-          terraform init
-          env:
-            AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          # terraform plan
-          # terraform apply -auto-approve          
+      - name: Terraform Init
+        run: terraform init -backend-config="bucket=${{ secrets.AWS_S3_BUCKET }}"
 
