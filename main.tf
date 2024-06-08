@@ -25,6 +25,10 @@ resource "aws_ecs_cluster" "hello_world_cluster" {
   name = "hello-world-cluster"
 }
 
+resource "aws_cloudwatch_log_group" "hello_world_log_group" {
+  name              = "/ecs/hello-world"
+  retention_in_days = 7
+}
 resource "aws_ecs_task_definition" "hello_world_task" {
   family                   = "hello-world-task"
   network_mode             = "awsvpc"
@@ -34,12 +38,20 @@ resource "aws_ecs_task_definition" "hello_world_task" {
 
   container_definitions = jsonencode([{
     name      = "hello-world"
-    image     = "nginx:latest"
+    image     = "anilyadava/hello-world:latest"
     essential = true
     portMappings = [{
-      containerPort = 80
-      hostPort      = 80
+      containerPort = 3000
+      hostPort      = 3000
     }]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = "/ecs/hello-world"
+        "awslogs-region"        = "us-east-1"
+        "awslogs-stream-prefix" = "ecs"
+      }
+    }
   }])
 
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
@@ -80,7 +92,7 @@ resource "aws_ecs_service" "hello_world_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.hello_world_tg.arn
     container_name   = "hello-world"
-    container_port   = 80
+    container_port   = 3000
   }
   depends_on = [  
     aws_lb.hello_world_lb,
@@ -98,7 +110,7 @@ resource "aws_lb" "hello_world_lb" {
 
 resource "aws_lb_target_group" "hello_world_tg" {
   name     = "hello-world-tg"
-  port     = 80
+  port     = 3000
   protocol = "HTTP"
   vpc_id   = aws_vpc.demo.id
   target_type = "ip"
