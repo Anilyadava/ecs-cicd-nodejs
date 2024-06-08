@@ -32,3 +32,6 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend-config="bucket=${{ secrets.AWS_S3_BUCKET }}"
 
+      - name: Terraform plan
+        run: terraform plan
+
